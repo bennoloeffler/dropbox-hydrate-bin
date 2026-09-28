@@ -110,7 +110,7 @@ public func collect(_ paths: [String]) -> [String] {
 public typealias Materializer = @Sendable (String) -> Void
 
 /// The real materializer. Read-only: it reads at most one byte inside the coordination.
-public func coordinatedRead(_ path: String) {
+@Sendable public func coordinatedRead(_ path: String) {
     var error: NSError?
     NSFileCoordinator(filePresenter: nil).coordinate(
         readingItemAt: URL(fileURLWithPath: path), options: [], error: &error

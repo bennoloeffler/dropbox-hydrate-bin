@@ -9,6 +9,21 @@ let fakeDropbox: Materializer = { path in
     try? Data("downloaded".utf8).write(to: URL(fileURLWithPath: path))
 }
 
+/// Counts how many materializer calls run at the same time.
+final class ConcurrencyGauge: @unchecked Sendable {
+    private let lock = NSLock()
+    private var active = 0
+    private(set) var peak = 0
+
+    func enter() {
+        lock.lock(); active += 1; peak = max(peak, active); lock.unlock()
+    }
+
+    func leave() {
+        lock.lock(); active -= 1; lock.unlock()
+    }
+}
+
 final class HydrateCoreTests: XCTestCase {
     var dir: String!
 
@@ -143,15 +158,14 @@ final class HydrateCoreTests: XCTestCase {
     func testJobsLimitsConcurrency() {
         for jobs in [1, 3] {
             let files = (0..<9).map { file("j\(jobs)-\($0).pdf") }
-            let lock = NSLock()
-            var active = 0
-            var peak = 0
+            let gauge = ConcurrencyGauge()
             _ = hydrate(files, jobs: jobs, timeout: 10) { path in
-                lock.lock(); active += 1; peak = max(peak, active); lock.unlock()
+                gauge.enter()
                 Thread.sleep(forTimeInterval: 0.1)
                 fakeDropbox(path)
-                lock.lock(); active -= 1; lock.unlock()
+                gauge.leave()
             }
+            let peak = gauge.peak
             XCTAssertLessThanOrEqual(peak, jobs, "jobs=\(jobs)")
             if jobs > 1 { XCTAssertGreaterThan(peak, 1, "jobs=\(jobs) should run in parallel") }
         }
