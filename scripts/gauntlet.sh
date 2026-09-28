@@ -13,7 +13,7 @@ if swift build 2>&1 | grep -E "warning:|error:"; then echo "build: warnings/erro
 echo "build: clean"
 step "tests x3 (flakiness), one run parallel"
 for i in 1 2 3; do swift test 2>&1 | grep -E "^\s*Executed .* tests" | tail -1; done
-swift test --parallel 2>&1 | tail -1
+swift test --parallel 2>&1 | grep -E "^\[[0-9]+/[0-9]+\]" | tail -1
 step "coverage";    scripts/coverage.sh | tail -1
 step "mutation";    python3 scripts/mutate.py
 step "mutation negative control (must report SURVIVED)"
