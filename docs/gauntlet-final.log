@@ -1,0 +1,72 @@
+
+=== toolchain
+swift-driver version: 1.115.1 Apple Swift version 6.0.3 (swiftlang-6.0.3.1.10 clang-1600.0.30.1)
+Apple LLVM version 16.0.0
+
+=== lint
+lint: clean
+
+=== build (zero warnings)
+build: clean
+
+=== tests x3 (flakiness), one run parallel
+	 Executed 17 tests, with 0 failures (0 unexpected) in 1.649 (1.651) seconds
+	 Executed 17 tests, with 0 failures (0 unexpected) in 1.640 (1.641) seconds
+	 Executed 17 tests, with 0 failures (0 unexpected) in 1.645 (1.647) seconds
+[17/17] Testing HydrateCoreTests.HydrateCoreTests/testJobsLimitsConcurrency
+
+=== coverage
+[0/1] Planning build
+Building for debugging...
+[0/6] Write swift-version--58304C5D6DBC2206.txt
+[2/8] Emitting module HydrateCore
+[3/8] Compiling HydrateCore Hydrate.swift
+[4/12] Emitting module dropbox_hydrate_bin
+[5/12] Compiling dropbox_hydrate_bin main.swift
+[5/12] Write Objects.LinkFileList
+[7/12] Compiling HydrateCoreTests HydrateCoreTests.swift
+[8/12] Emitting module HydrateCoreTests
+[8/14] Linking dropbox-hydrate-bin
+[9/14] Applying dropbox-hydrate-bin
+[11/14] Emitting module dropbox_hydrate_binPackageTests
+[12/14] Compiling dropbox_hydrate_binPackageTests runner.swift
+[12/14] Write Objects.LinkFileList
+[13/14] Linking dropbox-hydrate-binPackageTests
+Build complete! (2.46s)
+coverage: HydrateCore lines 100.00% (min 100%)
+
+=== mutation
+M1   killed     every regular file counts as placeholder
+M2   killed     Office lock files not skipped
+M3   killed     hidden folders walked
+M4   killed     --jobs 0 accepted
+M5   killed     no concurrency limit
+M6   killed     timeout ignored
+M7   killed     dry run downloads
+M8   killed     files that stay empty still exit 0
+M9   killed     coordinated read writes to the file
+M10  killed     no default path
+mutation: 10/10 killed
+
+=== mutation negative control (must report SURVIVED)
+C0   SURVIVED   harmless comment edit (must survive)
+mutation: 0/1 killed
+
+=== release build
+bin/dropbox-hydrate-bin: replacing existing signature
+build-release: bin/dropbox-hydrate-bin (x86_64 arm64, 1.0.0)
+
+=== integration (real Dropbox, release binary)
+control: plain read left it at 0 bytes
+3 placeholder(s) found.
+3/3 local.
+  273346 bytes  20190109 Kooperation VS SP_2.jpg
+  504521 bytes  20190109 Kooperation VS SP_1.jpg
+  226759 bytes  2018_02_13 MIK Denkwerkstatt_Strama.docx
+integration: 3/3 downloaded, no app started, no document handed on
+
+=== source state
+commit 41761d9
+
+GAUNTLET GREEN
+GAUNTLET EXIT 0
