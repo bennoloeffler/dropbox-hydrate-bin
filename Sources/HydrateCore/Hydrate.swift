@@ -46,7 +46,7 @@ let usage = """
 /// Parses the command line. Paths are not checked here; `run` does that.
 public func parse(_ args: [String]) throws -> Options {
     var o = Options()
-    var rest = args[...]
+    var rest = ArraySlice(args)
     while let arg = rest.popFirst() {
         switch arg {
         case "--dry-run": o.dryRun = true
@@ -85,8 +85,8 @@ public func collect(_ paths: [String]) -> [String] {
     var found = Set<String>()
     for path in paths {
         var isDir: ObjCBool = false
-        guard FileManager.default.fileExists(atPath: path, isDirectory: &isDir) else { continue }
-        if !isDir.boolValue {
+        let isFolder = FileManager.default.fileExists(atPath: path, isDirectory: &isDir) && isDir.boolValue
+        if !isFolder {
             if isPlaceholder(path) { found.insert(path) }
             continue
         }
@@ -177,7 +177,7 @@ public func run(
     }
     out("\(files.count) placeholder(s) found.")
     if o.dryRun {
-        files.forEach { out("  \($0)") }
+        for file in files { out("  \(file)") }
         return 0
     }
 
@@ -185,6 +185,6 @@ public func run(
     out("\(result.local.count)/\(files.count) local.")
     if result.empty.isEmpty { return 0 }
     err("\(result.empty.count) file(s) stayed empty (really empty, offline, or timed out):")
-    result.empty.forEach { err("  \($0)") }
+    for file in result.empty { err("  \(file)") }
     return 1
 }

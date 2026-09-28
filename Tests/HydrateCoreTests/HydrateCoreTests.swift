@@ -16,11 +16,16 @@ final class ConcurrencyGauge: @unchecked Sendable {
     private(set) var peak = 0
 
     func enter() {
-        lock.lock(); active += 1; peak = max(peak, active); lock.unlock()
+        lock.lock()
+        active += 1
+        peak = max(peak, active)
+        lock.unlock()
     }
 
     func leave() {
-        lock.lock(); active -= 1; lock.unlock()
+        lock.lock()
+        active -= 1
+        lock.unlock()
     }
 }
 
@@ -58,7 +63,8 @@ final class HydrateCoreTests: XCTestCase {
     func runCLI(_ args: [String], _ materialize: @escaping Materializer = fakeDropbox) -> Run {
         var out: [String] = []
         var err: [String] = []
-        let code = HydrateCore.run(args, out: { out.append($0) }, err: { err.append($0) }, materialize: materialize)
+        let code = HydrateCore.run(
+            args, out: { out.append($0) }, err: { err.append($0) }, materialize: materialize)
         return Run(code: code, out: out, err: err)
     }
 
@@ -191,8 +197,12 @@ final class HydrateCoreTests: XCTestCase {
         XCTAssertEqual(o.timeout, 2.5)
         XCTAssertEqual(o.jobs, 7)
         XCTAssertEqual(o.paths, ["x", "y"])
-        XCTAssertThrowsError(try parse(["--nope"])) { XCTAssertEqual($0 as? UsageError, .unknownFlag("--nope")) }
-        XCTAssertThrowsError(try parse(["--jobs"])) { XCTAssertEqual($0 as? UsageError, .missingValue("--jobs")) }
+        XCTAssertThrowsError(try parse(["--nope"])) {
+            XCTAssertEqual($0 as? UsageError, .unknownFlag("--nope"))
+        }
+        XCTAssertThrowsError(try parse(["--jobs"])) {
+            XCTAssertEqual($0 as? UsageError, .missingValue("--jobs"))
+        }
     }
 
     // S13
